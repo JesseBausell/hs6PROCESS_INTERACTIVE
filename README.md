@@ -9,7 +9,7 @@ Inputs:
 metadata_HeaderFile_hs6.txt - ascii file containing metadata required to process hs6 data 
 
 Outputs:
-Station_#_bb.txt - Seabass-formatted ascii file containing individual particulate backscattering (bbp) + fl spectra
+Station_#_bbp.mat - MAT/HDF5 file containing individual particulate backscattering (bbp) + fl spectra. No sigma correction applied.
 Station_#_bb_bin#.txt* - Seabass-formatted ascii file(s) containing sigma-corrected and depth-binned bbp spectra, as well as depthb-binned fl spectra
 
 Required Matlab Scripts and Functions:
