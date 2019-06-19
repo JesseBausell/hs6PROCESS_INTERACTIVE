@@ -10,18 +10,18 @@ metadata_HeaderFile_hs6.txt - ascii file containing metadata required to process
 
 Outputs:
 Station_#_bbp.mat - MAT/HDF5 file containing individual particulate backscattering (bbp) + fl spectra. No sigma correction applied.
-Station_#_bb_bin#.txt* - Seabass-formatted ascii file(s) containing sigma-corrected and depth-binned bbp spectra, as well as depthb-binned fl spectra
+Station_#_bbp_bin#_HE53.txt - Seabass-formatted ascii file(s) containing sigma-corrected and depth-binned bbp spectra, as well as depthb-binned fl spectra. One binned hs6 file (of equal bin size) is produced bin absorption file listed in metadata_HeaderFile_hs6.txt. These files are formatted for Hydrolight 5.0
 
 Required Matlab Scripts and Functions:
+dataSNATCH5.m
+depthSELECTOR.m
 Doxarian_SIGMA.m
-hs6_binFUNCTION.m
+hs6_binFUNCTION_HE53.m
+HS6_dataFLAGGER5.m
 HS6_fileREADER_MS.m
 lambda_INTERPOLATE.m
 metaData_Reader_hs6.m
 morel_Correction_pw.m
-
-Required data files:
-Seabass_header_ACS5.mat
 
 Program Description:
 hs6PROCESS_SEABASS processes raw field-collected backscattering coefficients following a series of steps. It is outfitted to process raw data contained in Hydrosoft-output ascii (.dat) files. Hydrosoft is a free software package provided by HOBI Labs for preliminary processing of its optical oceanographic instrumentation. 
@@ -29,29 +29,37 @@ hs6PROCESS_SEABASS processes raw field-collected backscattering coefficients fol
   2. Calculates particulate backscattering coefficients (bbp)
     a. Calculates wavelength-dependent backscattering coefficients of pure-water using methods devised by Morrel (1974)
     b. Subtracts pure-water backscattering coefficients from total (uncorrected) backscattering coefficients
-  3. Time stamps bbp and fl spectra. It can also synchronize bbp spectra with ac-s data processed by acsPROCESS_SEABASS 
-  4. QA/QC hs6 data. Individual bbp spectra + fluorescence measurements are flagged for removal if bbp are less than zero or greater than      0.5 /m
-  5. Produces SeaBASS-formatted ascii (.txt) file containing time-stamped bbp spectra/fluorescence values with depths at which they were        sampled
+  3. Prompts user to select a subset of the cast for processing (unselected portions of the cast will be excluded from all subsequent steps)
+  4. QA/QC bbp data. bbp spectra are flagged and removed by user:
+    a. user flags bbp spectra that may be contaminated
+    b. user determines whether to remove previously-flagged bbp spectra. If an a spectrum is removed, its corresponding (paired) fl values are removed automatically.
+  5. Produces MAT/HDF5 file containing processed individual bbp spectra, corresponding fl values, as well as their depths and wavelengths
   6. Depth-bin bbp and fl spectra.
     a. Sigma-correct bbp spectra according to Doxaran et al. (2016) using depth-binned absorption spectra measured with ac-s. A binned 
-    absorption spectrum is chosen for each bbp spectrum using nearest neighbor approach. 
-    b. bbp and fl are depth-binned at using the same bin size as the absorption spectra used to sigma-correct them
-  7. Produces SeaBASS-formatted ascii (.txt) file(s) containing depth-binned bbp and fl average spectra and standard deviations. 
+    absorption spectrum is chosen for each bbp spectrum using nearest neighbor approach with respect to depth. 
+    b. bbp and fl are depth-binned at  the same bin size as the absorption spectra used to sigma-correct them
+  7. Produces Hydrolight-compatible ascii (.txt) file(s) containing depth-binned bbp and fl averages. 
 
 User Instructions:
   1. Fill out metadata_HeaderFile_hs6.txt (as specified below)
   2. Run hs6PROCESS_SEABASS using Matlab command window.
   3. Select appropriate metadata_HeaderFile_hs6.txt file when prompted. 
-  6. Time-stamp hs6 data for potential syncrhonization with ac-s (if ac-s was deployed simultaneously)
-    a. Matlab will produce a "time series" plot indicating hs6 position (depth) over "time" (spectum index).
-    b. User selects a reference point on this plot by entering the index of the desired point into the command window. Data cursor is a 
-    useful resource.
-    c. User is asked to confirm his/her selection on command window with y/n keys. If user rejects his/her selection, he/she will be           prompted to try again.
-    d. User is now asked to enter a "reference time". This will be used to determine the exact time of day that the reference point (step
-    6b) was measured by hs6. This time of day should be GMT and formatted as military time (HH:MM:SS). This reference time is used to 
-    back and forward-calculate time of day from the reference point.***
-    
- ***If user wishes to syncrhonize hs6 time stamps with those of an ac-s cast, he/she should select a reference point in the same position as that of ac-s cast adn enter the time stamp appearing at the top of the figure (see Station_#_ACS.fig) when prompted to do so. As with acsPROCESS_SEABASS, this time should be GMT and formatted at military time.
+  4. Flag questionable bbp spetra for possible removal. 
+    a. Examine depth profile comparing bbp channels (lowest wavelengths). These channels are oriented vertically by depth index (not by actual depth), with shallowest index on top.
+    b. To create an acceptable range of c values, enter "y" into command window in response to message "Create ACS Limit?" To skip steps
+    c-e, enter "n".
+    c. Using the command window, enter an upper limit for bbp, press enter, enter a lower limit for bbp, and press enter. "0" is good lower limit because bbp is always positive.
+    d. Limits are indicated on depth profile by black vertical lines. Enter "y" or "n" into command window to accept limits or try again. 
+    e. Any spectrum containing bbp values outside of user-selected range will be automatically flagged. A flagged spectrum
+    is indicated by a row of white stars (one on each channel). If satisfied with limits, enter "n" when "Create ACS limit? (y/n)" re-
+    appears on command window.
+    f. To flag a single spectrum enter "y" in response to "Flag additional ACS readings? (y/n):" command window prompt. Enter "n" to skip
+    this step completely.
+      If "y" is entered, prompt will say "Enter depth of data you want to flag: ". Flag the spectrum of interest by entering its index 
+      into the command window. An identical bbp depth profile will then appear indicating ONLY the flagged spectrum that was just flagged. Confirm selection with
+      "y", reject with "n".
+    g. Enter "n" in response to step f prompt shift end interactive QA/QC. 
+
  
 Filling out metadata_HeaderFile_hs6.txt:
 hs6PROCESS_SEABASS relies on a metadata header to process hs6 data. All information pertaining to the specific hs6 cast should be included in this header. A header template (metadata_HeaderFile_hs6.txt), indicating important fields, is provided in the hs6PROCESS_SEABASS repository on GitHub. When filling out this header file, the first three headers (indicating user instructions) should be left alone. Required information fields contain = signs. USER SHOULD ONLY ALTER TEXT APPEARING ON THE RIGHT HAND SIDE OF =. User should indicate unavailability of desired information with "NA". DO NOT DELETE ROWS! Below are fields contained in metadata_HeaderFile_hs6.txt and instructions on how to fill them out. Spaces should never be used in header fields; use underscore instead (_).
@@ -78,13 +86,13 @@ documents=additional documents user wishes to submit to SeaBASS. DO NOT INDICATE
 
 water_depth=bottom depth of the field station in meters. Numerals only. Do not include units.
 
-calibration_file=name of original factory-supplied HOBI Labs calibration file. This file contains instrument-specific coefficients used to convert raw signals (measured by hs6) into engineering units. Although this file is not used by hs6PROCESS_SEABASS to process hs6 data (it was used in Hydrosoft), SEABaSS encourages submitters to disclose all ancillary calibration files used in data processing. hs6PROCESS_SEABASS will correctly place this file into headers of output files (e.g. Station_#_bb.txt and Station_#_bb_bin#.txt).
+calibration_file=name of original factory-supplied HOBI Labs calibration file. This file contains instrument-specific coefficients used to convert raw signals (measured by hs6) into engineering units. Although this file is not used by hs6PROCESS_INTERACTIVE, the user was too lazy to remove it from the code. Therefore, its still necessary to run hs6PROCESS_INTERACTIVE. 
 
 date(yyyymmdd)=indicate date on which ha6 was deployed.
 
 kexp_vals=wavelength-dependent constants (kexp) used to calculate sigma coefficients of attenutation, Kbb, (see HydroSoft user manual or kudelalab_HS6_readme.pdf for details). These coefficients are instrument-specific and can be found inside the factory-supplied calibration file (header field=calibration_file). They should be listed in the same order as wavelengths of backscattering coefficients appear in the header of the HydroSoft-generated .dat file containing the unprocessed hs6 data (header field=data_file_name). In the event that instrument-specific Kexp_vals are unavailable for a particular Hydroscat, the constant 0.14 can be used for all wavelengths. In the event that it's used, this value should still be listed one time for each backscattering channel (e.g. 6 times for hs6).
 
-apg_bin_files=binned ac-s measured absorption files with which to sigma-correct bbp spectra. These files must be formatted for SEABaSS submission and would ideally contain data measured at the same time and location as hs6. DO NOT specify depth bin sizes in the metadata header file. hs6PROCESS_SEABASS bins hs6 data according to the bin sizes used in absorpiton files listed in hte header field. To prevent hs6PROCESS_SEABASS from depth-binning bbp and fl data, place "NA" after the = sign (e.g. apg_bin_files=NA).
+apg_bin_files=binned ac-s measured absorption files with which to sigma-correct bbp spectra. These files must be formatted for Hydrolight 5.0 and would ideally contain data measured at the same time and location as hs6. DO NOT specify depth bin sizes in the metadata header file. hs6PROCESS_SEABASS bins hs6 data according to the bin sizes used in absorpiton files listed in hte header field. To prevent hs6PROCESS_SEABASS from depth-binning bbp and fl data, place "NA" after the = sign (e.g. apg_bin_files=NA).
 
 apg_bin_path=pathway for apg_bin_files. This pathway must be the same for all binned absorption files should more than one be listed.
 
