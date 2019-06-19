@@ -1,9 +1,9 @@
 # hs6PROCESS_INTERACTIVE
-Consistent with up to date protocols , hs6PROCESS_INTERACTIVE processes raw backscattering data as sampled in natural water bodies using HOBI Labs Hydroscat-6 (hs6). hs6PROCESS_SEABASS should is also designed to be compatible with Hydroscat-4 and 2.
+Consistent with up to date protocols, hs6PROCESS_INTERACTIVE processes raw backscattering data as sampled in natural water bodies using HOBI Labs Hydroscat-6 (hs6). hs6PROCESS_SEABASS should is also designed to be compatible with Hydroscat-4 and 2.
 
-This Matlab script processes raw backscattering coefficients, as sampled in natural water bodies using HOBI Labs Hydroscat-6 Backscattering Meter and Fluorometer (hs6). Consistent with up to date protocols, hs6PROCESS_INTERACTIVE processes raw backscattering data (engineering units) sampled in natural water bodies using hs6. hs6PROCESS_INTERACTIVE is designed to be compatible with Hydroscat-4 (hs4) and Hydroscat-2 (hs2), however it remains untested with these two instrument variants. We also point out that, the expectation for two fluorescence (fl) channels is hardcoded into the hs6PROCESS_SEABASS script. Thus (uncorrected) input hs6 data MUST contain two fl channels. Otherwise it may not work properly. The wavelengths of these hardcoded  fl channels are as follows: 470 excitation/510 emission (channel 1) and 442 excitation/700 emission (channel 2). Nevertheless, if these wavelength values are incorrect, user should not worry. hs6PROCESS_SEABASS does not perform any processing steps on fl values that require knowing the correct fl wavelengths. This means that user can simply "correct" fl wavelengths in the output files after processing.
+This Matlab script processes backscattering coefficients, as sampled in natural water bodies using HOBI Labs Hydroscat-6 Backscattering Meter and Fluorometer (hs6). Consistent with up to date protocols, hs6PROCESS_INTERACTIVE processes raw backscattering data (engineering units) sampled in natural water bodies using hs6. hs6PROCESS_INTERACTIVE is also designed to be compatible with Hydroscat-4 (hs4) and Hydroscat-2 (hs2)] instrument variants. We point out however that the expectation for two fluorescence (fl) channels is hardcoded into the hs6PROCESS_SEABASS script. Thus (uncorrected) input hs6 data MUST contain two fl channels. Otherwise it may not work properly. The wavelengths of these hardcoded  fl channels are as follows: 470 excitation/510 emission (channel 1) and 442 excitation/700 emission (channel 2). Nevertheless, if these wavelength values are incorrect, user should not worry. hs6PROCESS_SEABASS does not perform any processing steps on fl values that require knowing the correct fl wavelengths. This means that user can simply "correct" fl wavelengths in the output files after processing.
 
-hs6PROCESS_INTERACTIVE uses up to date processing protocols (as of June 2019) to process backscattering coefficients, which it outputs as both individual as well as depth-binned spectra. All output data products are formatted as to be consistent with Hydrolight 5.0. User should run hs6PROCESS_INTERACTIVE AFTER running acs_PROCESS_INTERACTIVE, if he/she wishes to perform Doxaran et al. (2016) sigma-correction.
+hs6PROCESS_INTERACTIVE uses up to date processing protocols (as of June 2019) to process backscattering coefficients, which it outputs as both individual as well as depth-binned spectra. All output data products are formatted as to be consistent with Hydrolight 5.0. User should run hs6PROCESS_INTERACTIVE AFTER running acsPROCESS_INTERACTIVE, if he/she wishes to perform Doxaran et al. (2016) sigma-correction.
 
 Inputs:
 metadata_HeaderFile_hs6.txt - ascii file containing metadata required to process hs6 data 
@@ -24,42 +24,49 @@ metaData_Reader_hs6.m
 morel_Correction_pw.m
 
 Program Description:
-hs6PROCESS_SEABASS processes raw field-collected backscattering coefficients following a series of steps. It is outfitted to process raw data contained in Hydrosoft-output ascii (.dat) files. Hydrosoft is a free software package provided by HOBI Labs for preliminary processing of its optical oceanographic instrumentation. 
+hs6PROCESS_INTERACTIVE processes raw field-collected backscattering coefficients following a series of steps. It is outfitted to process raw data contained in Hydrosoft-output ascii (.dat) files. Hydrosoft is a free software package provided by HOBI Labs for preliminary processing of its optical oceanographic instrumentation. It uses the following steps:
   1. Reads ascii data. Accepts uncorrected backscattering coefficients and uncorrected fluorescence.
   2. Calculates particulate backscattering coefficients (bbp)
     a. Calculates wavelength-dependent backscattering coefficients of pure-water using methods devised by Morrel (1974)
     b. Subtracts pure-water backscattering coefficients from total (uncorrected) backscattering coefficients
   3. Prompts user to select a subset of the cast for processing (unselected portions of the cast will be excluded from all subsequent steps)
   4. QA/QC bbp data. bbp spectra are flagged and removed by user:
-    a. user flags bbp spectra that may be contaminated
+    a. user flags 'suspect' bbp spectra that may be contaminated
     b. user determines whether to remove previously-flagged bbp spectra. If an a spectrum is removed, its corresponding (paired) fl values are removed automatically.
   5. Produces MAT/HDF5 file containing processed individual bbp spectra, corresponding fl values, as well as their depths and wavelengths
-  6. Depth-bin bbp and fl spectra.
+  6. Depth-bins bbp and fl spectra.
     a. Sigma-correct bbp spectra according to Doxaran et al. (2016) using depth-binned absorption spectra measured with ac-s. A binned 
     absorption spectrum is chosen for each bbp spectrum using nearest neighbor approach with respect to depth. 
-    b. bbp and fl are depth-binned at  the same bin size as the absorption spectra used to sigma-correct them
+    b. bbp and fl are depth-binned at the same bin size as that of the the absorption spectra used to sigma-correct them
   7. Produces Hydrolight-compatible ascii (.txt) file(s) containing depth-binned bbp and fl averages. 
 
 User Instructions:
   1. Fill out metadata_HeaderFile_hs6.txt (as specified below)
-  2. Run hs6PROCESS_SEABASS using Matlab command window.
+  2. Run hs6PROCESS_INTERACTIVE using Matlab command window.
   3. Select appropriate metadata_HeaderFile_hs6.txt file when prompted. 
-  4. Flag questionable bbp spetra for possible removal. 
-    a. Examine depth profile comparing bbp channels (lowest wavelengths). These channels are oriented vertically by depth index (not by actual depth), with shallowest index on top.
-    b. To create an acceptable range of c values, enter "y" into command window in response to message "Create ACS Limit?" To skip steps
-    c-e, enter "n".
-    c. Using the command window, enter an upper limit for bbp, press enter, enter a lower limit for bbp, and press enter. "0" is good lower limit because bbp is always positive.
-    d. Limits are indicated on depth profile by black vertical lines. Enter "y" or "n" into command window to accept limits or try again. 
-    e. Any spectrum containing bbp values outside of user-selected range will be automatically flagged. A flagged spectrum
-    is indicated by a row of white stars (one on each channel). If satisfied with limits, enter "n" when "Create ACS limit? (y/n)" re-
-    appears on command window.
-    f. To flag a single spectrum enter "y" in response to "Flag additional ACS readings? (y/n):" command window prompt. Enter "n" to skip
-    this step completely.
-      If "y" is entered, prompt will say "Enter depth of data you want to flag: ". Flag the spectrum of interest by entering its index 
-      into the command window. An identical bbp depth profile will then appear indicating ONLY the flagged spectrum that was just flagged. Confirm selection with
-      "y", reject with "n".
-    g. Enter "n" in response to step f prompt shift end interactive QA/QC. 
-
+  4. Select subset of ac-s cast for processing 
+    a. Examine time-series plot of ac-s cast (appears automatically). Plot displays ac-s vertical position (depth) over time (spectrum index).
+    b. To select subset of ac-s cast, enter "y" into command window
+    c. Select cast subset by entering indices into command window. These can be entered individually (not recommended) or as an array,
+    using a colon to separate beginning and end indices (recommended). Matlab's figure data cursor can help determine indices.
+    d. Evaluate previously-selected cast subset(s) (highlighted in red). To select an additional cast subset enter repeat steps b-c. 
+    e. If satsified with previously-made selection(s) enter "n" into the command window. Re-confirm you are satisfied by entering "y"
+    f. If unsatisfied with selections, enter "redo" or "exit" to start over.
+  5. Flag questionable bbp spetra for possible removal. 
+    a. Examine depth profiles of bbp channel. These channels are oriented vertically by depth index (as opposed to actual depth), with shallowest index on top.
+    b. To create an acceptable range of bbp values, enter "y" into command window in response to message "Create ACS Limit?" To skip steps
+    5c-e, enter "n".**
+    c. When prompted, use the command window to: enter an upper limit for bbp, press enter, enter a lower limit for bbp, and press enter. "0" is good lower limit because bbp is always positive.
+    d. Your selected Limits are indicated on depth profile by black vertical lines. Enter "y" into command window to accept limits or "n" to try again. 
+    e. Any spectrum containing bbp values outside of user-selected range for channels 1-8 will be automatically flagged. A flagged spectrum is indicated by a row of white stars (one on each bbp channel). If satisfied with limits, enter "n" when "Create ACS limit? (y/n)" re-appears on command window.
+    f. To flag a single spectrum enter "y" in response to "Flag additional ACS readings? (y/n):" command window prompt. Enter "n" to skip this step completely. If "y" is entered, prompt will read "Enter depth of data you want to flag: ". Enter the index of the spectrum of interest into the command window. You then will be asked to confirm or reject your selection ("y" or "n") as you view it. Repeat as many times as necessary. Respond with "n" to "Flag additional ACS readings? (y/n):" to stop flagging bbp specta.
+    h. Enter "y" on command window in response to "Accept modified HS6 data? (y/n)". This piece of code is an artifact from a previous feature. However the coder (me) was too lazy to remove it, so please answer "y" so you don't mess anything up!
+  6. Evaluate flagged bbp spectra. You will now be asked to accept or reject your flagged bbp spectra.
+    a.  View your first flagged bbp spectrum in the subplot display. Flagged spectrum (red) will be plotted with all bbp spectra (blue) that fall within the 2 m depth bin (e.g. 0-2 m, 2-4 m, etc.) that encompasses it. Flagged c spectrum will also be ploted along with bbp spectra in the adjacent 2 m depth bin(s). Solid black lines represent mean +/- 3*sigma of the unflagged c spectrum within a bin. Subplots are also labeled with numerical depth (m) of flagged spectrum.
+    b. Compare shape and magnitude of flagged bbp spectrum against unflagged spectra.
+    b. In the command window, enter "keep" to retain and "discard" to remove spectrum from analysis. DO NOT SELECT "EDIT"
+    c. Confirm your decision using "y" or "n"
+    d. Repeat steps a-c with the remainder of flagged c spectra.    
  
 Filling out metadata_HeaderFile_hs6.txt:
 hs6PROCESS_SEABASS relies on a metadata header to process hs6 data. All information pertaining to the specific hs6 cast should be included in this header. A header template (metadata_HeaderFile_hs6.txt), indicating important fields, is provided in the hs6PROCESS_SEABASS repository on GitHub. When filling out this header file, the first three headers (indicating user instructions) should be left alone. Required information fields contain = signs. USER SHOULD ONLY ALTER TEXT APPEARING ON THE RIGHT HAND SIDE OF =. User should indicate unavailability of desired information with "NA". DO NOT DELETE ROWS! Below are fields contained in metadata_HeaderFile_hs6.txt and instructions on how to fill them out. Spaces should never be used in header fields; use underscore instead (_).
