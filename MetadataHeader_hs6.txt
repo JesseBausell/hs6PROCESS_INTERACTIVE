@@ -1,0 +1,19 @@
+hs-6 metadata template
+Template contains information necessary for the processing of hs-6 data files (.dat) output using the HOBI Labs software program HydroSoft. Use commas to separate names of investigators and files, but DO NOT leave ANY spaces between words. If a space is unavoidable, use an underscore between words (like_this). Unknown or unavailable information should be indicated with NA. Latitude and longitude should be in decimal degrees and water depth should be in meters. Do not include units of measurement. These will be added later by the program. 
+#### DO NOT ALTER HEADER FIELDS####
+data_file_name=Insert_here
+data_file_path=Insert_here
+affiliations=Insert_here
+investigators=Insert_here
+contact=Insert_here
+experiment=Insert_here
+station=Insert_here
+latitude=Insert_here
+longitude=Insert_here
+documents=NA
+water_depth=Insert_here
+calibration_files=Insert_here 
+date(yyyymmdd)=insert_here
+kexp_vals=NA
+apg_bin_files=NA
+apg_bin_path=NA
