@@ -44,8 +44,8 @@ User Instructions:
   1. Fill out metadata_HeaderFile_hs6.txt (as specified below)
   2. Run hs6PROCESS_INTERACTIVE using Matlab command window.
   3. Select appropriate metadata_HeaderFile_hs6.txt file when prompted. 
-  4. Select subset of ac-s cast for processing 
-    a. Examine time-series plot of ac-s cast (appears automatically). Plot displays ac-s vertical position (depth) over time (spectrum index).
+  4. Select subset of hs6 cast for processing 
+    a. Examine time-series plot of hs6 cast (appears automatically). Plot displays hs6 vertical position (depth) over time (spectrum index).
     b. To select subset of hs6 cast, enter "y" into command window
     c. Select cast subset by entering indices into command window. These can be entered individually (not recommended) or as an array,
     using a colon to separate beginning and end indices (recommended). Matlab's figure data cursor can help determine indices.
@@ -59,7 +59,7 @@ User Instructions:
     c. When prompted, use the command window to: enter an upper limit for bbp, press enter, enter a lower limit for bbp, and press enter. "0" is good lower limit because bbp is always positive.
     d. Your selected Limits are indicated on depth profile by black vertical lines. Enter "y" into command window to accept limits or "n" to try again. 
     e. Any spectrum containing bbp values outside of user-selected range for channels 1-8 will be automatically flagged. A flagged spectrum is indicated by a row of white stars (one on each bbp channel). If satisfied with limits, enter "n" when "Create ACS limit? (y/n)" re-appears on command window.
-    f. To flag a single spectrum enter "y" in response to "Flag additional ACS readings? (y/n):" command window prompt. Enter "n" to skip this step completely. If "y" is entered, prompt will read "Enter depth of data you want to flag: ". Enter the index of the spectrum of interest into the command window. You then will be asked to confirm or reject your selection ("y" or "n") as you view it. Repeat as many times as necessary. Respond with "n" to "Flag additional ACS readings? (y/n):" to stop flagging bbp specta.
+    f. To flag a single spectrum enter "y" in response to "Flag additional hs6 readings? (y/n):" command window prompt. Enter "n" to skip this step completely. If "y" is entered, prompt will read "Enter depth of data you want to flag: ". Enter the index of the spectrum of interest into the command window. You then will be asked to confirm or reject your selection ("y" or "n") as you view it. Repeat as many times as necessary. Respond with "n" to "Flag additional hs6 readings? (y/n):" to stop flagging bbp specta.
     h. Enter "y" on command window in response to "Accept modified HS6 data? (y/n)". This piece of code is an artifact from a previous feature. However the coder (me) was too lazy to remove it, so please answer "y" so you don't mess anything up!
   6. Evaluate flagged bbp spectra. You will now be asked to accept or reject your flagged bbp spectra.
     a.  View your first flagged bbp spectrum in the subplot display. Flagged spectrum (red) will be plotted with all bbp spectra (blue) that fall within the 2 m depth bin (e.g. 0-2 m, 2-4 m, etc.) that encompasses it. Flagged c spectrum will also be ploted along with bbp spectra in the adjacent 2 m depth bin(s). Solid black lines represent mean +/- 3*sigma of the unflagged c spectrum within a bin. Subplots are also labeled with numerical depth (m) of flagged spectrum.
