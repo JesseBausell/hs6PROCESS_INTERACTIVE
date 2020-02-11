@@ -46,7 +46,7 @@ User Instructions:
   3. Select appropriate metadata_HeaderFile_hs6.txt file when prompted. 
   4. Select subset of ac-s cast for processing 
     a. Examine time-series plot of ac-s cast (appears automatically). Plot displays ac-s vertical position (depth) over time (spectrum index).
-    b. To select subset of ac-s cast, enter "y" into command window
+    b. To select subset of hs6 cast, enter "y" into command window
     c. Select cast subset by entering indices into command window. These can be entered individually (not recommended) or as an array,
     using a colon to separate beginning and end indices (recommended). Matlab's figure data cursor can help determine indices.
     d. Evaluate previously-selected cast subset(s) (highlighted in red). To select an additional cast subset enter repeat steps b-c. 
